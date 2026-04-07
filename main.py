@@ -1,5 +1,7 @@
 # 결과 확인할 때는 `python 파일명`으로 터미널에 입력
-from fastapi import FastAPI
+from fastapi import FastAPI, Path, Query
+from request import UserCreateRequest
+from response import UserResponse
 
 app = FastAPI()
 
@@ -50,13 +52,76 @@ def get_users_handler():
 # search는 숫자가 아니므로 해당 오류에 걸리는 것
 # 이러한 코드는 위에서부터 순서대로 진행되므로 제일 윗부분은 무조건 상위걸로,
 # 그 다음부터는 하위로 이동하는 느낌에 {}로 변수처리로 관리하는 것은 제일 하단으로 배치
-@app.get("/users/search")
-def search_user_handler():
-    return {"msg": "searching..."}
+# @app.get("/users/search")
+# def search_user_handler():
+#     return {"msg": "searching..."}
 
+# @app.get("/users/{user_id}")
+# def get_user_handler(user_id: int): # GET /users/1 에서 1은 사실 문자열 "1" 이기 때문에 타입 변환 필요
+#     for user in users:
+#         if user["id"] == user_id:
+#             return user
+#     # return None이 숨어있음 -> 데이터에 없는(예: id=4)걸 시도하면 null로 나옴
+
+# ------------------------------------------------------
+
+# GET /users/search?name=alex
+# GET /users/search?job=student
+@app.get("/users/search")
+def search_user_handler(
+    name: str | None = Query(None),
+    job: str | None = Query(None),
+):
+    # 예외의 경우:
+    # 1) name과 job 둘 다 안 보내는 경우
+    if name is None and job is None:
+        return {"msg": "조회에 사용할 QueryParam이 필요합니다."}
+    return {"name": name, "job": job}
+    
+    # 위 return 값에 대한 세부적인 조건 방식
+    # for user in users:
+    #     if name and job:
+    #         if user["name"] == name and user["job"] == job:
+    #             return user
+    #         else:
+    #             return None
+    #     else:
+    #         if user["name"] == name:
+    #             return user
+    #         if user["job"] == job:
+    #             return user
+    # http://127.0.0.1:8000/users/search?job=student 만 입력하면 에러가 뜨는데 이유는 name도 같이 명시해줘야 함
+    # 둘 다 필수로 써야한다면 (name:str, job: str) 이렇게 둘 다 쓰면 되지만, 둘 중 하나만으로도 동작하게 하려면 선택적으로 해야 함
+    # 둘 중 하나만으로도 한다면 name: str | None = Query(None) 이런식으로 하면 됨. (= None은 기본값 세팅)
+
+    # name과 job 둘 다 써서 검색한다면 url에 이렇게 작성: http://127.0.0.1:8000/users/search?name=alex&job=student
+
+
+
+# GET /users/{user_id} -> {user_id}번 사용자 데이터 조회
 @app.get("/users/{user_id}")
-def get_user_handler(user_id: int): # GET /users/1 에서 1은 사실 문자열 "1" 이기 때문에 타입 변환 필요
+def get_user_handler(
+    # ge: 이상(= Greater than or Equal to)
+    user_id: int = Path(..., ge=1), # user_id에 필수값 + 조건 설정
+):
     for user in users:
         if user["id"] == user_id:
             return user
-    # return None이 숨어있음 -> 데이터에 없는(예: id=4)걸 시도하면 null로 나옴
+
+# 회원 추가 API
+# POST /users
+@app.post("/users", response_model=UserResponse) # 아래 2번에서 실수로 민감 정보를 넣어도 이 UserResponse만 잘 작성되어있으면 문제 없음. 사용하는걸 권장.
+def create_user_handler(
+    # 1) 사용자 데이터를 넘겨 받는다 -> 데이터 유효성 검사
+    body: UserCreateRequest
+):
+    # 2) 사용자 데이터를 저장한다
+    new_user = {
+        "id": len(users) + 1, # 원래는 DB에서 할당해준다
+        "name": body.name,
+        "job": body.job,
+    }
+    users.append(new_user)
+
+    # 3) 응답을 반환한다
+    return new_user
