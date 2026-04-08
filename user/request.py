@@ -7,5 +7,6 @@ class UserCreateRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=10)
     job: str
 
-
-request_body: UserCreateRequest = UserCreateRequest(name="david", job="teacher")
+# 사용자 데이터를 수정할 때 데이터 형식
+class UserUpdateRequest(BaseModel):
+    job: str # 직업만 수정한다고 가정
