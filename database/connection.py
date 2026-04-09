@@ -16,3 +16,11 @@ SessionFactory = sessionmaker(
     autoflush=False,
     expire_on_commit=False,
 )
+
+# SQLAlchemy 세션을 주입하고 관리하는 함수
+def get_session():
+    session = SessionFactory()
+    try:
+        yield session # return 대신 yield. 일시정지라고 생각하면 된다
+    finally:
+        session.close()
