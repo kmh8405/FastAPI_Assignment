@@ -1,4 +1,8 @@
-# FastAPI Practice
+# FastAPI & Asyncio Practice
+
+FastAPI를 활용한 백엔드 API 개발과 Python 비동기 프로그래밍(asyncio)을 함께 학습한 레포지토리
+
+---
 
 ## Run
 pip install -r requirements.txt
@@ -39,6 +43,17 @@ fastapi dev main.py
 - Implement dynamic query building using SQLAlchemy (select, where chaining)
 - Handle validation and errors with proper HTTP status codes (400, 404)
 - Understand ORM behavior (no need for add() on update, delete vs expunge)
+
+### Day 5 - Asynchronous Programming
+- Introduction to asyncio and asynchronous programming
+- Define coroutine functions using `async def`
+- Understand that calling a coroutine returns a coroutine object (not executed immediately)
+- Execute coroutines using `asyncio.run`
+- Understand that `await` pauses execution and yields control to the event loop
+- Run multiple coroutines concurrently with `asyncio.gather`
+- Complare execution time between sync (`time.sleep`) and async (`asyncio.sleep`)
+- Understand blocking vs non-blocking behavior
+- Learn that `await` can only be used inside async functions and with awaitable objects
 
 
 ## Dependencies
