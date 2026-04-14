@@ -51,24 +51,40 @@ fastapi dev main.py
 - Execute coroutines using `asyncio.run`
 - Understand that `await` pauses execution and yields control to the event loop
 - Run multiple coroutines concurrently with `asyncio.gather`
-- Complare execution time between sync (`time.sleep`) and async (`asyncio.sleep`)
+- Compare execution time between sync (`time.sleep`) and async (`asyncio.sleep`)
 - Understand blocking vs non-blocking behavior
 - Learn that `await` can only be used inside async functions and with awaitable objects
 
+### Day 6 - Async FastAPI & Database Integration
+- Refactor all API handlers to async (`async def`)
+- Apply asynchronous SQLAlchemy (`create_async_engine`, `async_sessionmaker`)
+- Use `await session.execute()` for non-blocking DB queries
+- Integrate `aiosqlite` for async SQLite driver
+- Maintain dependency injection with async session (`Depends`)
+- Understand difference between sync and async DB execution
+- Apply proper async transaction handling (`await commit`, `await refresh`)
+- Handle blocking code using `run_in_threadpool`
+- Control thread pool size using FastAPI lifespan and `anyio`
+- Improve API performance by enabling non-blocking request handling
 
 ## Dependencies
 - fastapi: Main web framework for building APIs
 - uvicorn: ASGI server used to run FastAPI (also used internally by `fastapi dev`)
 - pydantic: Data validation and schema management for request/response models
 - sqlalchemy: ORM for database interaction
+- aiosqlite: Async SQLite driver for SQLAlchemy
+- greenlet: Required for SQLAlchemy async operations
+- anyio: Async concurrency support (used in threadpool control)
 
 ## Database & Session Management
 - Uses SQLAlchemy ORM with SQLite (`local.db`)
-- Database session is managed using FastAPI dependency injection (`Depends`)
-- `get_session()` creates a session per request and ensures proper cleanup
-- CRUD operations are fully integrated with the database
+- Supports both synchronous and asynchronous DB sessions
+- Async session is managed using FastAPI dependency injection (`Depends`)
+- `get_async_session()` ensures session lifecycle (create → yield → close)
+- CRUD operations are fully integrated with async DB handling
 
 ## Notes
 - SQLite database (`local.db`) is automatically created when running the application.
-- All APIs are now connected to the database (no longer using in-memory data)
-- Dependency Injection (`Depends`) is used for managing DB sessions across all endpoints
+- All APIs are fully migrated to async-based database handling
+- Blocking operations are safely handled using threadpool (`run_in_threadpool`)
+- Async architecture allows better scalability and performance under concurrent requests
